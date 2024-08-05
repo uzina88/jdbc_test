@@ -1,4 +1,4 @@
-package book;
+package member;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -9,9 +9,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+public class MemberDAO {
 
-public class BookDAO {
-
+	
 	// 드라이버 설정
 	final String driver = "org.mariadb.jdbc.Driver";
 	// 아이피 설정
@@ -29,14 +29,12 @@ public class BookDAO {
 	PreparedStatement pstmt = null;
 	// 결과값 담기
 	ResultSet rs = null;
+
 	
-	
-	// 정상적으로 수행이 되는지 체크하기 위해 0으로 선언
-	// 1. 도서정보 입력
-	public int insertBook(BookInfo bookInfo) {
-		// 초기값 0으로 설정
-		int resultChk = 0;
-		// 데이터 베이스 접속 시작
+	// 1. 회원정보 등록
+	public int insertMember(Member member) {
+		int chk = 0;
+
 		try {
 			Class.forName(driver);
 			conn = DriverManager.getConnection(db_url, "root", "1234");
@@ -53,30 +51,28 @@ public class BookDAO {
 		// 데이터 베이스 접속 끝
 		// 쿼리 작성 시작
 		try {
-			String sql = "INSERT INTO tb_book_info(\r\n"
-					+ "book_title,\r\n"
-					+ "book_price,\r\n"
-					+ "book_author,\r\n"
-					+ "book_publisher,\r\n"
-					+ "book_pubYear,\r\n"
-					+ "book_isbn,\r\n"
-					+ "book_page\r\n"
+			String sql = "INSERT INTO tb_member_info(\r\n"
+					+ "	member_id,\r\n"
+					+ "    member_pw,\r\n"
+					+ "    member_name,\r\n"
+					+ "    member_birth,\r\n"
+					+ "    member_email,\r\n"
+					+ "    member_phone\r\n"
 					+ ") VALUES (\r\n"
-					+ "	?,?,?,?,?,?,?\r\n"
+					+ "	?,?,?,?,?,?\r\n"
 					+ ");";
 
 
 			pstmt = conn.prepareStatement(sql);
-			pstmt.setString(1, bookInfo.getTitle());
-			pstmt.setInt(2, bookInfo.getPrice());
-			pstmt.setString(3, bookInfo.getAuthor());
-			pstmt.setString(4, bookInfo.getPublisher());
-			pstmt.setString(5, bookInfo.getPubYear());
-			pstmt.setString(6, bookInfo.getIsbn());
-			pstmt.setInt(7, bookInfo.getPage());
+			pstmt.setString(1, member.getMemberId());
+			pstmt.setString(2, member.getMemberPw());
+			pstmt.setString(3, member.getMemberName());
+			pstmt.setString(4, member.getMemberBirth());
+			pstmt.setString(5, member.getMemberEmail());
+			pstmt.setString(6, member.getMemberPhone());
 			
 			// rs =  pstmt.executeQuery 는 셀렉트(실행) 할때 사용
-			resultChk = pstmt.executeUpdate();
+			chk = pstmt.executeUpdate();
 			
 		}catch (SQLException e) {
 			// TODO: handle exception
@@ -95,14 +91,14 @@ public class BookDAO {
 			}
 		}
 		
-		return resultChk;
+		return chk;
 	}
 	
 	
 	// 2. 도서정보 수정(update, insert, delect는 public int로 해야함
-	public int updateBook(int bookId, String updateTitle) {
+	public int updateMember(int MemberIdx, String updateName) {
 	// 초기값 0으로 설정
-		int resultChk = 0;
+		int chk = 0;
 		// 데이터 베이스 접속 시작
 		try {
 			Class.forName(driver);
@@ -120,16 +116,16 @@ public class BookDAO {
 		// 쿼리문 실행
 		try {
 			
-			String sql = "UPDATE tb_book_info\r\n"
-					+ "SET book_title = ?\r\n"
-					+ "WHERE book_id =?;";
+			String sql = "UPDATE tb_member_info\r\n"
+					+ "SET member_name = ?\r\n"
+					+ "WHERE member_idx =?;";
 
 			pstmt = conn.prepareStatement(sql);
 			// ? 물음표에 대한 값 설정
-			pstmt.setString(1,updateTitle);
-			pstmt.setInt(2,bookId);
+			pstmt.setString(1,updateName);
+			pstmt.setInt(2,MemberIdx);
 			// ? 물음표에 대한 값 설정
-			resultChk = pstmt.executeUpdate();
+			chk = pstmt.executeUpdate();
 		
 		
 		}catch (SQLException e) {
@@ -153,14 +149,13 @@ public class BookDAO {
 			}
 		}
 		
-		return resultChk;
+		return chk;
 	}
 	
-	
-	// 3. 도서정보 삭제
-	public int deleteBook(String title) {
+	// 3.회원정보 삭제
+	public int deleteMember(int MemberIdx, String deleteName) {
 		// 초기값 0으로 설정
-		int resultChk = 0;
+		int chk = 0;
 		// 데이터 베이스 접속 시작
 		try {
 			Class.forName(driver);
@@ -178,13 +173,14 @@ public class BookDAO {
 		// 쿼리문 실행
 		try {
 			
-			String sql = "DELETE FROM tb_book_info WHERE book_title = ?;";
+			String sql = "DELETE FROM tb_member_info WHERE member_idx = ?;";
 
 			pstmt = conn.prepareStatement(sql);
 			// ? 물음표에 대한 값 설정
-			pstmt.setString(1,title);
+			pstmt.setInt(1,MemberIdx);
+			pstmt.setString(2,deleteName);
 			// ? 물음표에 대한 값 설정
-			resultChk = pstmt.executeUpdate();
+			chk = pstmt.executeUpdate();
 		
 		
 		}catch (SQLException e) {
@@ -208,14 +204,14 @@ public class BookDAO {
 			}
 		}
 		
-		return resultChk;
+		return chk;
 	}
 	
 	
-	//4. 도서정보 검색 출력
-	public List<HashMap<String, Object>> printSearchBooks(String title){
+	//4. 회원정보 검색 출력
+	public List<HashMap<String, Object>> printMember(String name){
 		   // 리스트 초기화 선언(담아둘 공간 생성)
-		   List<HashMap<String, Object>> bookList = new ArrayList();
+		   List<HashMap<String, Object>> memberList = new ArrayList();
 		
 		try {
 			Class.forName(driver);
@@ -232,40 +228,34 @@ public class BookDAO {
 		}
 		
 		try {
-			String sql = "SELECT book_id,\r\n"
-					+ "book_title,\r\n"
-					+ "book_price,\r\n"
-					+ "book_author,\r\n"
-					+ "book_publisher,\r\n"
-					+ "book_pubYear,\r\n"
-					+ "book_isbn,\r\n"
-					+ "book_page,\r\n"
-					+ "create_date,\r\n"
-					+ "update_date\r\n"
-					+ "FROM tb_book_info\r\n"
-					+ "WHERE book_title like concat('%', ?, '%');\r\n"
-					+ "";
+			String sql = "SELECT member_idx,\r\n"
+					+ "member_id,\r\n"
+					+ "member_pw,\r\n"
+					+ "member_name,\r\n"
+					+ "member_birth,\r\n"
+					+ "member_email,\r\n"
+					+ "member_phone\r\n"
+					+ "FROM tb_member_info\r\n"
+					+ "WHERE member_name = ?;";
 
 
 			pstmt = conn.prepareStatement(sql);
 			// ? 물음표에 대한 값 설정
-			pstmt.setString(1,title);
+			pstmt.setString(1,name);
 			rs = pstmt.executeQuery();
 		
 			
 			while(rs.next()) {
 				HashMap<String, Object> rsMap = new HashMap<String, Object>();
-				rsMap.put("book_id", rs.getInt("book_id")); 
-				rsMap.put("book_title", rs.getString("book_title"));
-				rsMap.put("book_price", rs.getInt("book_price"));
-				rsMap.put("book_author", rs.getString("book_author"));
-				rsMap.put("book_publisher", rs.getString("book_publisher"));
-				rsMap.put("book_pubYear", rs.getString("book_pubYear"));
-				rsMap.put("book_isbn", rs.getString("book_isbn"));
-				rsMap.put("book_page", rs.getInt("book_page"));
-				rsMap.put("create_date", rs.getString("create_date"));
-				rsMap.put("update_date", rs.getString("update_date"));
-				bookList.add(rsMap);
+				rsMap.put("member_idx", rs.getString("member_idx")); 
+				rsMap.put("member_id", rs.getString("member_id")); 
+				rsMap.put("member_pw", rs.getString("member_pw"));
+				rsMap.put("member_name", rs.getString("member_name"));
+				rsMap.put("member_birth", rs.getString("member_birth"));
+				rsMap.put("member_email", rs.getString("member_email"));
+				rsMap.put("member_phone", rs.getString("member_phone"));
+				
+				memberList.add(rsMap);
 
 			}
 		
@@ -290,13 +280,18 @@ public class BookDAO {
 			}
 		}
 		
-		return bookList;
+		return memberList;
 	}
 	
-	// 5. 도서정보 모든 출력
-	public List<HashMap<String, Object>> printAllBooks(){
+	
+	// 5. 회원정보 모든 출력
+	public List<HashMap<String, Object>> printAllMembers(){
+		
 		// 사용하기 위해 초기화 선언
-		List<HashMap<String, Object>> bookList = new ArrayList();
+		List<HashMap<String, Object>> memberList = new ArrayList();
+				
+		int chk = 0;
+
 		// 데이터 연결
 		try {
 			Class.forName(driver);
@@ -313,19 +308,13 @@ public class BookDAO {
 		}
 		// 쿼리 입력
 		try {
-			String sql = "SELECT book_id,\r\n"
-					+ "book_title,\r\n"
-					+ "book_price,\r\n"
-					+ "book_author,\r\n"
-					+ "book_publisher,\r\n"
-					+ "book_pubYear,\r\n"
-					+ "book_isbn,\r\n"
-					+ "book_page,\r\n"
-					+ "create_date,\r\n"
-					+ "update_date\r\n"
-					+ "FROM tb_book_info;\r\n"
-					+ "";
-
+			String sql = "SELECT member_id,\r\n"
+					+ "member_pw,\r\n"
+					+ "member_name,\r\n"
+					+ "member_birth,\r\n"
+					+ "member_email,\r\n"
+					+ "member_phone\r\n"
+					+ "FROM tb_member_info;";
 
 			pstmt = conn.prepareStatement(sql);
 			// rs = pstmt.executeQuery(); 값을 담아줌(셀렉트 할때만 사용)
@@ -337,19 +326,15 @@ public class BookDAO {
 				// HashMap 바구니안에 값을 넣어줘라 key값과 value값으로 구성
 				// String 문자, Object 객체(아무거나 상관없이 들어감)
 				HashMap<String, Object> rsMap = new HashMap<String, Object>();
-				rsMap.put("book_id", rs.getInt("book_id")); 
-				rsMap.put("book_title", rs.getString("book_title"));
-				rsMap.put("book_price", rs.getInt("book_price"));
-				rsMap.put("book_author", rs.getString("book_author"));
-				rsMap.put("book_publisher", rs.getString("book_publisher"));
-				rsMap.put("book_pubYear", rs.getString("book_pubYear"));
-				rsMap.put("book_isbn", rs.getString("book_isbn"));
-				rsMap.put("book_page", rs.getInt("book_page"));
-				rsMap.put("create_date", rs.getString("create_date"));
-				rsMap.put("update_date", rs.getString("update_date"));
+				rsMap.put("member_id", rs.getString("member_id")); 
+				rsMap.put("member_pw", rs.getString("member_pw"));
+				rsMap.put("member_name", rs.getString("member_name"));
+				rsMap.put("member_birth", rs.getString("member_birth"));
+				rsMap.put("member_email", rs.getString("member_email"));
+				rsMap.put("member_phone", rs.getString("member_phone"));
 				
 				// HashMap 리스트 바구니에 값음 넣어줌
-				bookList.add(rsMap);
+				memberList.add(rsMap);
 			}
 		
 		}catch (SQLException e) {
@@ -372,8 +357,12 @@ public class BookDAO {
 				e.printStackTrace();
 			}
 		}
-		// 값을 반환(담아줌)
-		return bookList;
+		// 값을 반환(담아줌) 
+		// 여러데이터를 반환해야 하기 떄문에 memberList 이걸로 담아줌
+		return memberList;
 	}
+	
+	
+	
 	
 }

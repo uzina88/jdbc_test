@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-public class jdbc_test1 {
+public class jdbc_test01 {
 
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
@@ -114,4 +114,5 @@ public class jdbc_test1 {
 		}
 	}
 
+	
 }

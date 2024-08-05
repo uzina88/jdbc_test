@@ -26,7 +26,7 @@ public class BookServiceImpl implements BookService {
 				break;
 			case 2 :
 				System.out.println("2. 도서 정보 수정");
-				// updateBook();
+				updateBook();
 				break;
 			case 3 : 
 				System.out.println("3. 도서 정보 삭제");
@@ -115,6 +115,49 @@ public class BookServiceImpl implements BookService {
 	}
 	
 	
+	// 2.도서 정보 수정
+		public void updateBook() {
+			
+			System.out.println("도서명 입력해 주세요>>>>>");
+			sc.nextLine();
+			// title 변수로 담아줌. 도서명 입력받기
+			String title = sc.nextLine();
+			
+			// title 파마레타 값 받기
+			List<HashMap<String, Object>> bookList = new ArrayList();
+			bookList = bookDAO.printSearchBooks(title);
+			
+			System.out.println("도서ID\t도서명\t\t저자\t\t출판사\t\t발행년도");
+			for(int i=0; i<bookList.size(); i++) {
+				System.out.print(bookList.get(i).get("book_id")+"\t");
+				System.out.print(bookList.get(i).get("book_title")+"\t");
+				System.out.print(bookList.get(i).get("book_author")+"\t");
+				System.out.print(bookList.get(i).get("book_publisher")+"\t\t");
+				System.out.println(bookList.get(i).get("book_pubYear")+"\t\t");
+				System.out.println(bookList.get(i).get("create_date")+"\t\t");
+			}
+			System.out.println("수정할 도서의 순번을 입력하세요>>>>>");
+			int num = sc.nextInt();
+			// Object int형으로 변환
+			// List는 첫번째가 0번째라서 num-1을 해줘야함
+			int bookId = Integer.parseInt(bookList.get(num-1).get("book_id").toString());
+			System.out.println("변경될 도서명을 입력하세요>>>>");
+			sc.nextLine();
+			String updateTitle = sc.nextLine();
+			// 결과값 resultChk 안에 입력된 데이터 담아줌
+			int resultChk = 0;
+			// BookDAO 와 연결
+			resultChk = bookDAO.updateBook(bookId, updateTitle);
+			// 값이 들어가면 등록됨. 그래서 resultChk가 0보다 커야함
+			if(resultChk > 0) {
+				System.out.println("도서정보가 수정되었습니다.");
+			} else {
+				System.out.println("도서정보 수정에 실패하였습니다.");
+			}
+		}	
+			
+	
+	
 	// 3.도서 정보 삭제
 	public void deleteBook() {
 		
@@ -132,7 +175,7 @@ public class BookServiceImpl implements BookService {
 		if(resultChk > 0) {
 			System.out.println("도서가 삭제되었습니다.");
 		} else {
-			System.out.println("도서 등록에 실패하였습니다.");
+			System.out.println("도서 삭제에 실패하였습니다.");
 		}
 	}	
 		
